@@ -1,6 +1,8 @@
 # flutter_code_gen
 
-A new Flutter project.
+A new Flutter project is experimental nature.
+一个实验性质的Flutter项目
+SDK version: flutter_windows_3.38.5-stable.zip
 
 ## Getting Started
 
