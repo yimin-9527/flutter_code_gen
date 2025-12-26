@@ -1,5 +1,6 @@
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_code_gen/src/myWidgets/MyHomeLeftListPage.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -42,8 +43,27 @@ class MyMainHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return Column(
-      children: [Text("内容")],
+    return Row(
+      children: [
+        Expanded(
+          flex: 2, // 30% 宽度 (3/(3+7)=30%)
+          child: Container(
+            color: const Color.fromARGB(255, 187, 155, 153),
+            alignment: Alignment.center,
+            child: MyMainHomeLeftListPage(),
+          ),
+        ),
+
+        // 中间：宽度40%，高度填满
+        Expanded(
+          flex: 8, // 40% 宽度
+          child: Container(
+            color: Colors.green,
+            alignment: Alignment.center,
+            child: Text('内容主体', style: TextStyle(color: Colors.white)),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -66,11 +86,38 @@ class MyHomePage extends StatelessWidget {
     var appState = context.watch<MyAppState>();
 
     return Scaffold(
-        body: Column(
-      children: [
-        FractionallySizedBox(heightFactor: 0.8, child: MyMainHomePage()),
-        FractionallySizedBox(heightFactor: 0.2, child: MyMenuPage())
-      ],
-    ));
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          // 获取可用高度
+          final availableHeight = constraints.maxHeight;
+
+          return Column(
+            children: [
+              // 固定高度的顶部
+              Container(
+                height: 50,
+                color: Colors.blue,
+                child: Center(child: Text('顶部')),
+              ),
+
+              // 动态高度的中间部分（剩余高度的70%）
+              Container(
+                height: availableHeight * 0.9 - 50, // 减去顶部高度
+                color: Colors.green,
+                child: Center(child: MyMainHomePage()),
+              ),
+
+              // 剩余30%的底部
+              Expanded(
+                child: Container(
+                  color: Colors.orange,
+                  child: Center(child: MyMenuPage()),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
   }
 }
