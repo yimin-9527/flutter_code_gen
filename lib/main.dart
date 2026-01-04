@@ -1,6 +1,7 @@
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_code_gen/src/myWidgets/MyHomeLeftListPage.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -20,6 +21,7 @@ class MyApp extends StatelessWidget {
           child: MaterialApp(
             title: '字节互联',
             theme: ThemeData(
+              fontFamily: 'AliFont',
               useMaterial3: true,
               colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
             ),
@@ -75,7 +77,41 @@ class MyMenuPage extends StatelessWidget {
         color: const Color.fromARGB(255, 239, 35, 96),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [Text("主页"), Text("通知"), Text("您")],
+          children: [
+            Center(
+              child: Column(
+                children: [
+                  SvgPicture.asset(
+                    "assets/icons/主页.svg",
+                    height: 30,
+                  ),
+                  Text("主页")
+                ],
+              ),
+            ),
+            Center(
+              child: Column(
+                children: [
+                  SvgPicture.asset(
+                    "assets/icons/通知.svg",
+                    height: 30,
+                  ),
+                  Text("通知")
+                ],
+              ),
+            ),
+            Center(
+              child: Column(
+                children: [
+                  SvgPicture.asset(
+                    "assets/icons/自己.svg",
+                    height: 30,
+                  ),
+                  Text("您")
+                ],
+              ),
+            ),
+          ],
         ));
   }
 }
