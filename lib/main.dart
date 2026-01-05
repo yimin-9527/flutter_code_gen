@@ -1,11 +1,19 @@
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_code_gen/src/myWidgets/MyHomeLeftListPage.dart';
+import 'package:flutter_code_gen/src/myWidgets/NotFoundPage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:url_router/url_router.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(
+    // 关键：必须在 MaterialApp 之上提供 Provider
+    ChangeNotifierProvider(
+      create: (context) => MyAppState(),
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -13,21 +21,41 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        width: double.infinity,
-        height: double.infinity,
-        child: ChangeNotifierProvider(
-          create: (context) => MyAppState(),
-          child: MaterialApp(
-            title: '字节互联',
-            theme: ThemeData(
-              fontFamily: 'AliFont',
-              useMaterial3: true,
-              colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
-            ),
-            home: MyHomePage(),
+    // 1. 创建路由委托
+    final UrlRouter router = UrlRouter(
+      // 2. 定义路由页面堆栈
+      onGeneratePages: (router) => [
+        // 首页始终存在
+        MaterialPage(child: HomeScreen()),
+        // 根据URL动态叠加页面
+        if (router.url == '/') ...[
+          MaterialPage(child: MyHomePage()),
+        ],
+        if (router.url == '/profile') ...[
+          MaterialPage(child: MyHomePage()),
+        ],
+      ],
+      // 3. 【关键】使用builder定义外层布局，navigator参数就是路由内容区
+      builder: (router, navigator) {
+        return Scaffold(
+          body: Row(
+            children: [
+              // 固定的侧边栏
+              SideBar(),
+              // 动态的路由内容区（这就是你的“Router-view”）
+              Expanded(child: navigator),
+            ],
           ),
-        ));
+        );
+      },
+    );
+
+    // 4. 使用 MaterialApp.router
+    return MaterialApp.router(
+      routeInformationParser: UrlRouteParser(),
+      routerDelegate: router,
+      title: 'Flutter Router-View Demo',
+    );
   }
 }
 
@@ -156,5 +184,28 @@ class MyHomePage extends StatelessWidget {
         },
       ),
     );
+  }
+}
+
+// --- 以下为示例组件 ---
+// 固定的侧边栏
+class SideBar extends StatelessWidget {
+  const SideBar({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 200,
+      color: Colors.blueGrey[50],
+      child: Column(), // 包含导航链接
+    );
+  }
+}
+
+// 主页
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return const Center(child: Text('Home Screen'));
   }
 }
