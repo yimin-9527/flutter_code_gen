@@ -75,6 +75,7 @@ class MyMenuPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
         color: const Color.fromARGB(255, 239, 35, 96),
+        padding: EdgeInsets.only(top: 10),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
