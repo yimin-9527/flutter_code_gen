@@ -38,13 +38,40 @@ class MyApp extends StatelessWidget {
       // 3. 【关键】使用builder定义外层布局，navigator参数就是路由内容区
       builder: (router, navigator) {
         return Scaffold(
-          body: Row(
-            children: [
-              // 固定的侧边栏
-              SideBar(),
-              // 动态的路由内容区（这就是你的“Router-view”）
-              Expanded(child: navigator),
-            ],
+          body: LayoutBuilder(
+            builder: (context, constraints) {
+              // 获取可用高度
+              final availableHeight = constraints.maxHeight;
+
+              return Column(
+                children: [
+                  // 固定高度的顶部
+                  Container(
+                    height: 50,
+                    color: Colors.blue,
+                    child: Center(child: Text('顶部')),
+                  ),
+
+                  // 动态高度的中间部分（剩余高度的70%）
+                  Container(
+                    height: availableHeight * 0.9 - 50, // 减去顶部高度
+                    color: Colors.green,
+                    child: Center(
+                      child: // 动态的路由内容区（这就是你的“Router-view”）
+                          Expanded(child: navigator),
+                    ),
+                  ),
+
+                  // 剩余30%的底部
+                  Expanded(
+                    child: Container(
+                      color: Colors.orange,
+                      child: Center(child: MyMenuPage()),
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
         );
       },
@@ -54,7 +81,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp.router(
       routeInformationParser: UrlRouteParser(),
       routerDelegate: router,
-      title: 'Flutter Router-View Demo',
+      title: '适界/Adaptive Edge',
     );
   }
 }
@@ -194,10 +221,46 @@ class SideBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 200,
-      color: Colors.blueGrey[50],
-      child: Column(), // 包含导航链接
-    );
+        color: const Color.fromARGB(255, 239, 35, 96),
+        padding: EdgeInsets.only(top: 10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Center(
+              child: Column(
+                children: [
+                  SvgPicture.asset(
+                    "assets/icons/主页.svg",
+                    height: 30,
+                  ),
+                  Text("主页")
+                ],
+              ),
+            ),
+            Center(
+              child: Column(
+                children: [
+                  SvgPicture.asset(
+                    "assets/icons/通知.svg",
+                    height: 30,
+                  ),
+                  Text("通知")
+                ],
+              ),
+            ),
+            Center(
+              child: Column(
+                children: [
+                  SvgPicture.asset(
+                    "assets/icons/自己.svg",
+                    height: 30,
+                  ),
+                  Text("您")
+                ],
+              ),
+            ),
+          ],
+        ));
   }
 }
 
