@@ -5,7 +5,7 @@ class NotFoundPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return Container(
+    return Container( 
         // 让Container填充全屏
         color: Colors.amber,
         child: ListView.separated(

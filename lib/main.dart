@@ -26,12 +26,12 @@ class MyApp extends StatelessWidget {
       // 2. 定义路由页面堆栈
       onGeneratePages: (router) => [
         // 首页始终存在
-        MaterialPage(child: HomeScreen()),
+        MaterialPage(child: MyHomePage()),
         // 根据URL动态叠加页面
-        if (router.url == '/') ...[
+        if (router.url == '/Inform') ...[
           MaterialPage(child: MyHomePage()),
         ],
-        if (router.url == '/profile') ...[
+        if (router.url == '/Me') ...[
           MaterialPage(child: MyHomePage()),
         ],
       ],
@@ -186,26 +186,15 @@ class MyHomePage extends StatelessWidget {
           return Column(
             children: [
               // 固定高度的顶部
-              Container(
-                height: 50,
-                color: Colors.blue,
-                child: Center(child: Text('顶部')),
-              ),
 
               // 动态高度的中间部分（剩余高度的70%）
               Container(
-                height: availableHeight * 0.9 - 50, // 减去顶部高度
+                height: availableHeight * 1, // 减去顶部高度
                 color: Colors.green,
                 child: Center(child: MyMainHomePage()),
               ),
 
               // 剩余30%的底部
-              Expanded(
-                child: Container(
-                  color: Colors.orange,
-                  child: Center(child: MyMenuPage()),
-                ),
-              ),
             ],
           );
         },
