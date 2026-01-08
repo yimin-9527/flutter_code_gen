@@ -1,6 +1,8 @@
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_code_gen/src/myWidgets/MyHomeLeftListPage.dart';
+import 'package:flutter_code_gen/src/myWidgets/MyInform.dart';
+import 'package:flutter_code_gen/src/myWidgets/MyMe.dart';
 import 'package:flutter_code_gen/src/myWidgets/NotFoundPage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -29,10 +31,13 @@ class MyApp extends StatelessWidget {
         MaterialPage(child: MyHomePage()),
         // 根据URL动态叠加页面
         if (router.url == '/Inform') ...[
-          MaterialPage(child: MyHomePage()),
+          MaterialPage(child: MyInform()),
         ],
         if (router.url == '/Me') ...[
-          MaterialPage(child: MyHomePage()),
+          MaterialPage(child: MyMe()),
+        ],
+        if (router.url == '/Home') ...[
+          MaterialPage(child: MyHomePage(router)),
         ],
       ],
       // 3. 【关键】使用builder定义外层布局，navigator参数就是路由内容区
@@ -66,7 +71,7 @@ class MyApp extends StatelessWidget {
                   Expanded(
                     child: Container(
                       color: Colors.orange,
-                      child: Center(child: MyMenuPage()),
+                      child: Center(child: MyMenuPage(router)),
                     ),
                   ),
                 ],
@@ -126,6 +131,8 @@ class MyMainHomePage extends StatelessWidget {
 }
 
 class MyMenuPage extends StatelessWidget {
+  const MyMenuPage({Key? key, required this.router}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -135,14 +142,21 @@ class MyMenuPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             Center(
-              child: Column(
-                children: [
-                  SvgPicture.asset(
-                    "assets/icons/主页.svg",
-                    height: 30,
-                  ),
-                  Text("主页")
-                ],
+              child: GestureDetector(
+                onTap: () {
+                  print('Column被点击了！');
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(router.push('/second'));
+                },
+                child: Column(
+                  children: [
+                    SvgPicture.asset(
+                      "assets/icons/主页.svg",
+                      height: 30,
+                    ),
+                    Text("主页")
+                  ],
+                ),
               ),
             ),
             Center(
