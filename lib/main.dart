@@ -1,21 +1,13 @@
-import 'package:english_words/english_words.dart';
+// lib/main.dart
 import 'package:flutter/material.dart';
-import 'package:flutter_code_gen/src/myWidgets/MyHomeLeftListPage.dart';
-import 'package:flutter_code_gen/src/myWidgets/MyInform.dart';
-import 'package:flutter_code_gen/src/myWidgets/MyMe.dart';
-import 'package:flutter_code_gen/src/myWidgets/NotFoundPage.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:provider/provider.dart';
-import 'package:url_router/url_router.dart';
+import 'package:flutter_code_gen/src/screens/discover_page.dart';
+import 'package:flutter_code_gen/src/screens/home_page.dart';
+import 'package:flutter_code_gen/src/screens/main_layout.dart';
+import 'package:flutter_code_gen/src/screens/profile_page.dart';
+import 'package:go_router/go_router.dart';
 
 void main() {
-  runApp(
-    // 关键：必须在 MaterialApp 之上提供 Provider
-    ChangeNotifierProvider(
-      create: (context) => MyAppState(),
-      child: MyApp(),
-    ),
-  );
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -23,255 +15,56 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 1. 创建路由委托
-    final UrlRouter router = UrlRouter(
-      // 2. 定义路由页面堆栈
-      onGeneratePages: (router) => [
-        // 首页始终存在
-        MaterialPage(child: MyHomePage()),
-        // 根据URL动态叠加页面
-        if (router.url == '/Inform') ...[
-          MaterialPage(child: MyInform()),
-        ],
-        if (router.url == '/Me') ...[
-          MaterialPage(child: MyMe()),
-        ],
-        if (router.url == '/Home') ...[
-          MaterialPage(child: MyHomePage(router)),
-        ],
-      ],
-      // 3. 【关键】使用builder定义外层布局，navigator参数就是路由内容区
-      builder: (router, navigator) {
-        return Scaffold(
-          body: LayoutBuilder(
-            builder: (context, constraints) {
-              // 获取可用高度
-              final availableHeight = constraints.maxHeight;
-
-              return Column(
-                children: [
-                  // 固定高度的顶部
-                  Container(
-                    height: 50,
-                    color: Colors.blue,
-                    child: Center(child: Text('顶部')),
-                  ),
-
-                  // 动态高度的中间部分（剩余高度的70%）
-                  Container(
-                    height: availableHeight * 0.9 - 50, // 减去顶部高度
-                    color: Colors.green,
-                    child: Center(
-                      child: // 动态的路由内容区（这就是你的“Router-view”）
-                          Expanded(child: navigator),
-                    ),
-                  ),
-
-                  // 剩余30%的底部
-                  Expanded(
-                    child: Container(
-                      color: Colors.orange,
-                      child: Center(child: MyMenuPage(router)),
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
-        );
-      },
-    );
-
-    // 4. 使用 MaterialApp.router
     return MaterialApp.router(
-      routeInformationParser: UrlRouteParser(),
-      routerDelegate: router,
-      title: '适界/Adaptive Edge',
+      routerConfig: _router,
+      title: '底部导航栏示例',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
 
-class MyAppState extends ChangeNotifier {
-  var current = WordPair.random();
-
-  // ↓ Add this.
-  void getNext() {
-    current = WordPair.random();
-    notifyListeners();
-  }
-}
-
-class MyMainHomePage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    // TODO: implement build
-    return Row(
-      children: [
-        Expanded(
-          flex: 2, // 30% 宽度 (3/(3+7)=30%)
-          child: Container(
-            color: const Color.fromARGB(255, 187, 155, 153),
-            alignment: Alignment.center,
-            child: MyMainHomeLeftListPage(),
-          ),
+// 路由配置
+final GoRouter _router = GoRouter(
+  initialLocation: '/home',
+  routes: [
+    // 主页面，包含底部导航栏
+    StatefulShellRoute.indexedStack(
+      builder: (context, state, navigationShell) {
+        // 返回包含底部导航栏的页面
+        return MainLayout(navigationShell: navigationShell);
+      },
+      branches: [
+        // 首页分支
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/home',
+              builder: (context, state) => const HomePage(),
+            ),
+          ],
         ),
-
-        // 中间：宽度40%，高度填满
-        Expanded(
-          flex: 8, // 40% 宽度
-          child: Container(
-            color: Colors.green,
-            alignment: Alignment.center,
-            child: Text('内容主体', style: TextStyle(color: Colors.white)),
-          ),
+        // 发现分支
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/discover',
+              builder: (context, state) => const DiscoverPage(),
+            ),
+          ],
+        ),
+        // 我的分支
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/profile',
+              builder: (context, state) => const ProfilePage(),
+            ),
+          ],
         ),
       ],
-    );
-  }
-}
-
-class MyMenuPage extends StatelessWidget {
-  const MyMenuPage({Key? key, required this.router}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-        color: const Color.fromARGB(255, 239, 35, 96),
-        padding: EdgeInsets.only(top: 10),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Center(
-              child: GestureDetector(
-                onTap: () {
-                  print('Column被点击了！');
-                  ScaffoldMessenger.of(context)
-                      .showSnackBar(router.push('/second'));
-                },
-                child: Column(
-                  children: [
-                    SvgPicture.asset(
-                      "assets/icons/主页.svg",
-                      height: 30,
-                    ),
-                    Text("主页")
-                  ],
-                ),
-              ),
-            ),
-            Center(
-              child: Column(
-                children: [
-                  SvgPicture.asset(
-                    "assets/icons/通知.svg",
-                    height: 30,
-                  ),
-                  Text("通知")
-                ],
-              ),
-            ),
-            Center(
-              child: Column(
-                children: [
-                  SvgPicture.asset(
-                    "assets/icons/自己.svg",
-                    height: 30,
-                  ),
-                  Text("您")
-                ],
-              ),
-            ),
-          ],
-        ));
-  }
-}
-
-class MyHomePage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
-
-    return Scaffold(
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          // 获取可用高度
-          final availableHeight = constraints.maxHeight;
-
-          return Column(
-            children: [
-              // 固定高度的顶部
-
-              // 动态高度的中间部分（剩余高度的70%）
-              Container(
-                height: availableHeight * 1, // 减去顶部高度
-                color: Colors.green,
-                child: Center(child: MyMainHomePage()),
-              ),
-
-              // 剩余30%的底部
-            ],
-          );
-        },
-      ),
-    );
-  }
-}
-
-// --- 以下为示例组件 ---
-// 固定的侧边栏
-class SideBar extends StatelessWidget {
-  const SideBar({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-        color: const Color.fromARGB(255, 239, 35, 96),
-        padding: EdgeInsets.only(top: 10),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Center(
-              child: Column(
-                children: [
-                  SvgPicture.asset(
-                    "assets/icons/主页.svg",
-                    height: 30,
-                  ),
-                  Text("主页")
-                ],
-              ),
-            ),
-            Center(
-              child: Column(
-                children: [
-                  SvgPicture.asset(
-                    "assets/icons/通知.svg",
-                    height: 30,
-                  ),
-                  Text("通知")
-                ],
-              ),
-            ),
-            Center(
-              child: Column(
-                children: [
-                  SvgPicture.asset(
-                    "assets/icons/自己.svg",
-                    height: 30,
-                  ),
-                  Text("您")
-                ],
-              ),
-            ),
-          ],
-        ));
-  }
-}
-
-// 主页
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('Home Screen'));
-  }
-}
+    ),
+  ],
+);
